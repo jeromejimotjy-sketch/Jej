@@ -36,17 +36,19 @@ jobs:
         run: |
           set -e
           mkdir -p project
-          unzip -q Vector-Modules-Source.zip -d project
+          unzip -q Vector-Modules-Source-Updated3.zip -d project
           find project -type f | head -100
 
       - name: Find Gradle project
         run: |
           set -e
           BUILD_FILE=$(find project -type f \( -name build.gradle -o -name build.gradle.kts \) | head -1)
+
           if [ -z "$BUILD_FILE" ]; then
-            echo "ERROR: No Gradle build file found."
+            echo "ERROR: No build.gradle or build.gradle.kts found."
             exit 1
           fi
+
           echo "PROJECT_DIR=$(dirname "$BUILD_FILE")" >> "$GITHUB_ENV"
 
       - name: Build mod
