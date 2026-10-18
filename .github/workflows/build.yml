@@ -1,3 +1,4 @@
+
 name: Build Vector Fabric Mod
 
 on:
@@ -24,40 +25,35 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Install Gradle
+        run: |
+          set -e
+          curl -fsSL https://services.gradle.org/distributions/gradle-8.10.2-bin.zip -o gradle.zip
+          unzip -q gradle.zip -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.10.2/bin" >> "$GITHUB_PATH"
+
       - name: Extract project
         run: |
           set -e
           mkdir -p project
           unzip -q Vector-Modules-Source.zip -d project
-          echo "Extracted files:"
-          find project -maxdepth 5 -type f | head -100
+          find project -type f | head -100
 
       - name: Find Gradle project
         run: |
           set -e
           BUILD_FILE=$(find project -type f \( -name build.gradle -o -name build.gradle.kts \) | head -1)
-
           if [ -z "$BUILD_FILE" ]; then
-            echo "ERROR: No build.gradle or build.gradle.kts found inside the ZIP."
+            echo "ERROR: No Gradle build file found."
             exit 1
           fi
-
-          PROJECT_DIR=$(dirname "$BUILD_FILE")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Found project: $PROJECT_DIR"
+          echo "PROJECT_DIR=$(dirname "$BUILD_FILE")" >> "$GITHUB_ENV"
 
       - name: Build mod
         run: |
           set -e
           cd "$PROJECT_DIR"
-
-          if [ -f gradlew ]; then
-            chmod +x gradlew
-            ./gradlew --no-daemon build
-          else
-            echo "ERROR: gradlew is missing from the project ZIP."
-            exit 1
-          fi
+          gradle --no-daemon build
 
       - name: Upload mod JAR
         uses: actions/upload-artifact@v4
