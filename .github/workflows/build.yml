@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "Vector-Modules-Source.zip"
+      - "Vector-Modules-Source-Updated3.zip"
       - ".github/workflows/build.yml"
 
 permissions:
