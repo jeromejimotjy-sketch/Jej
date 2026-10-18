@@ -1,21 +1,19 @@
+
 name: Build Vector Fabric Mod
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - "Vector-Modules-Source.zip"
+      - "Vector-Prestige-Style-Source.zip"
       - ".github/workflows/build.yml"
-
-permissions:
-  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Java 21
@@ -24,8 +22,21 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Extract Vector source
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+
+      - name: Extract project
         run: |
-          set -e
-          mkdir -p project
-          unzip -
+          unzip -q Vector-Prestige-Style-Source.zip -d project
+
+      - name: Build mod
+        working-directory: project/Vector-Fabric-1.21.1
+        run: gradle build --no-daemon
+
+      - name: Upload JAR files
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vector-Minecraft-1.21.1
+          path: project/Vector-Fabric-1.21.1/build/libs/*.jar
